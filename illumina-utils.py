@@ -19,3 +19,15 @@ iu-gen-configs 00_DEMULTIPLEXING_REPORT
 ls *.ini | sed 's/\.ini//g' > samples.txt  
 gunzip *.ini # we have to unzip the fastq files to run the following code
 for i in `cat samples.txt`; do iu-merge-pairs $i'.ini' -o $i'-merged' --enforce-Q30-check; done
+
+# You can look at a summary of the merging by looking at "STATS" 
+# FAILED are reads that failed to merge
+# FAILED_Q30 are reads that failed quality check
+# FAILED_WITH_Ns whether you get rid of reads with Ns
+# MERGED success! This file will specify the number of mismatches for a single read. If there is a mismatch, it takes the read for which the quality score is highest. 
+# MISMATCHES_BREAKDOWN mismatches found in merged region between reads
+
+# Filter out the reads that have more than three mismatches
+for i in `cat samples.txt`; do iu-filter-merged-reads $i'-merged_MERGED' -m 3; done
+
+
