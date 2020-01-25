@@ -10,7 +10,8 @@ Updated by A. Bulseco on 1/23/2020
 
 ## Activate QIIME2 
 Activate your working environment (replace "2019.10" with your own version if different)
-```source activate qiime2-2019.10 
+```
+source activate qiime2-2019.10 
 ```
 ## Demultiplexing
 Import sequences as an artifact into QIIME2 
@@ -37,7 +38,7 @@ qiime demux summarize \
   ```
   
 ## Running DADA2 
-View the output of demultiplexing (demux.qzv) using QIIME2 view to determine where to trim and truncate sequences for forward and reverse reads. In this case, we used the consensus method of Chimera removal and used --p-n-threads 0 to use all available cores. See here for more information on the DADA2 plugin and here for the paper associated with DADA2
+View the output of demultiplexing (demux.qzv) using QIIME2 view to determine where to trim and truncate sequences for forward and reverse reads. In this case, we used the consensus method of Chimera removal and used --p-n-threads 0 to use all available cores. See here for more information on the DADA2 plugin and [here](https://www.ncbi.nlm.nih.gov/pubmed/27214047) for the paper associated with DADA2
 
 ```
 qiime dada2 denoise-paired \
