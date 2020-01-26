@@ -53,5 +53,46 @@ qiime dada2 denoise-paired \
 --p-chimera-method consensus \
 --p-n-threads 0
 ```
+## Training the reference database
+For our taxonomic analysis, we used the [SILVA 132 release](https://www.arb-silva.de/download/archive/qiime). Download the taxonomy.txt and .fna file and import into QIIME 2 artifacts.
+```
+qiime tools import \
+  --type 'FeatureData[Sequence]' \
+  --input-path silva_132_99_16S.fna \
+  --output-path 99_perc.qza
   
+  qiime tools import \
+  --type 'FeatureData[Taxonomy]' \
+  --input-format HeaderlessTSVTaxonomyFormat \
+  --input-path consensus_taxonomy_7_levels.txt \
+  --output-path ref-taxonomy.qza
+  ```
+#### Extract reference reads
+When a Naive Bayes classifier is trained on only the region of the target sequences that was sequenced, in this case the 16S rRNA gene using the 515F/806R pair, it improves taxonomic accuracy. 
+```
+ qiime feature-classifier extract-reads \
+> --i-sequences 99_perc.qza \
+> --p-f-primer GTGCCAGCMGCCGCGGTAA \
+> --p-r-primer GGACTACHVGGGTWTCTAAT \
+> --p-min-length 100 \
+> --p-max-length 400 \
+> --o-reads ref-seqs-extract.qza
+```
+#### Train the classifier
+There was a mismatch with the version of scikit-learn installed (see error below) and ran an override as suggested by QIIME 2 message boards.
+
+Plugin error from feature-classifier:
+
+The scikit-learn version (0.19.1) used to generate this artifact does not match the current version of scikit-learn installed (0.21.2). Please retrain your classifier for your current deployment to prevent data-corruption errors.
+```
+conda install --override-channels -c defaults scikit-learn=0.21.2
+```
+Make sure you have enough disc space for the next few steps  
+```
+qiime feature-classifier fit-classifier-naive-bayes \
+> --i-reference-reads ref-seqs-extract.qza \
+> --i-reference-taxonomy ref-taxonomy.qza \
+> --o-classifier classifier.qza
+```
+
   
