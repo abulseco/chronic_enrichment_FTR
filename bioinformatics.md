@@ -174,6 +174,31 @@ qiime feature-table filter-samples \
  qiime feature-table summarize \
   --i-table table-DNAonly.qza \
   --o-visualization table-DNAonly.qzv
+```
+ Filtering out the pre samples to only look at pre-experiment samples
+ ```
+ qiime feature-table filter-samples \
+  --i-table table-RNAonly.qza \
+  --m-metadata-file mapping-file.txt \
+  --p-where "SampleTime ='Post'" \
+  --o-filtered-table table-RNApost.qza
+  
+ qiime feature-table filter-samples \
+  --i-table table-DNAonly.qza \
+  --m-metadata-file mapping-file.txt \
+  --p-where "SampleTime ='Post'" \
+  --o-filtered-table table-DNApost.qza
+  
+# Summarize the tables
+qiime feature-table summarize \
+--i-table table-RNApost.qza \
+--o-visualization table-RNApost.qzv
+
+qiime feature-table summarize \
+--i-table table-DNApost.qza \
+--o-visualization table-DNApost.qzv
+ 
+ ```
   
  ## Beta diversity analysis
  Make a new directory and move new/final files. 
@@ -199,23 +224,22 @@ qiime diversity core-metrics-phylogenetic \
   --p-sampling-depth 15570 \
   --m-metadata-file mapping-file.txt \
   --output-dir core-metrics-results-RNA-15570
- ```
  
- Filtering out the pre samples to only look at pre-experiment samples
- ```
- qiime feature-table filter-samples \
-  --i-table table-RNAonly.qza \
+ # Re-run the beta diversity analyses without pre-samples
+ qiime diversity core-metrics-phylogenetic \
+  --i-phylogeny rooted-tree-new.qza \
+  --i-table table-DNApost.qza \
+  --p-sampling-depth 15775 \
   --m-metadata-file mapping-file.txt \
-  --p-where "SampleTime ='Post'" \
-  --o-filtered-table table-RNApost.qza
+  --output-dir core-metrics-results-DNApost-15775
   
- qiime feature-table filter-samples \
-  --i-table table-DNAonly.qza \
+ qiime diversity core-metrics-phylogenetic \
+  --i-phylogeny rooted-tree-new.qza \
+  --i-table table-RNApost.qza \
+  --p-sampling-depth 15570 \
   --m-metadata-file mapping-file.txt \
-  --p-where "SampleTime ='Post'" \
-  --o-filtered-table table-DNApost.qza
- 
+  --output-dir core-metrics-results-RNApost-15570
  ```
- 
+
 
   
