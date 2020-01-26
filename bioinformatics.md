@@ -116,7 +116,10 @@ In the next step, we will filter out the following:
 * By features: singletons < 2 
 
 ```
+# Make directory for filtered data 
 mkdir filtered-data
+
+# Filter samples out that had low sequencing depth
 qiime feature-table filter-samples \
 --i-table table-merged-new.qza \
 --p-min-frequency 1000 \
@@ -127,5 +130,92 @@ qiime feature-table summarize \
 --i-table filtered-data/table-nolow.qza \
 --o-visualization filtered-data/table-nolow.qzv
 
+# Filter out singletons
+qiime feature-table filter-features \
+  --i-table filtered-data/table-nolow.qza \
+  --p-min-frequency 2 \
+  --o-filtered-table filtered-data/table-nolow-nosingle.qza
+  
+qiime feature-table summarize \
+--i-table filtered-data/table-nolow-nosingle.qza \
+--o-visualization filtered-data/table-nolow-nosingle.qzv
+
+# Filter out mitochondria and chloroplasts
+qiime taxa filter-table \
+--i-table filtered-data/table-nolow-nosingle.qza \
+--i-taxonomy taxonomy.qza \
+--p-exclude mitochrondria,chloroplast,archaea \
+--o-filtered-table filtered-data/table-nolow-nosingle-notaxa.qza
+
+qiime feature-table summarize \
+--i-table filtered-data/table-nolow-nosingle-notaxa.qza \
+--o-visualization filtered-data/table-nolow-nosingle-notaxa.qzv
+
+# Filtering into DNA or RNA only after renaming table "table-all-final.qza"
+# RNA only
+cd filtered-data
+qiime feature-table filter-samples \
+  --i-table table-all-final.qza \
+  --m-metadata-file mapping-file.txt \
+  --p-where "SampleType='RNA'" \
+  --o-filtered-table table-RNAonly.qza
+  
+ qiime feature-table summarize \
+  --i-table table-RNAonly.qza \
+  --o-visualization table-RNAonly.qzv
+  
+ # DNA only 
+ qiime feature-table filter-samples \
+  --i-table table-all-final.qza \
+  --m-metadata-file mapping-file.txt \
+  --p-where "SampleType='DNA'" \
+  --o-filtered-table table-DNAonly.qza
+  
+ qiime feature-table summarize \
+  --i-table table-DNAonly.qza \
+  --o-visualization table-DNAonly.qzv
+  
+ ## Beta diversity analysis
+ Make a new directory and move new/final files. 
+ ```
+ cd .. # after prior analysis
+ mkdir analysis-files 
+ mv filtered-data/table-DNAonly.qza analysis-files
+ mv filtered-data/table-RNAonly.qza analysis-files
+ mv filtered-data/table-all-final.qza analysis-files
+ ```
+ Run the betadiversity analysis, rarifying to the shallowest sequencing depth (15775)
+ ```
+qiime diversity core-metrics-phylogenetic \
+  --i-phylogeny rooted-tree-new.qza \
+  --i-table table-DNAonly.qza \
+  --p-sampling-depth 15775 \
+  --m-metadata-file mapping-file.txt \
+  --output-dir core-metrics-results-DNA-15775
+  
+ qiime diversity core-metrics-phylogenetic \
+  --i-phylogeny rooted-tree-new.qza \
+  --i-table table-RNAonly.qza \
+  --p-sampling-depth 15570 \
+  --m-metadata-file mapping-file.txt \
+  --output-dir core-metrics-results-RNA-15570
+ ```
+ 
+ Filtering out the pre samples to only look at pre-experiment samples
+ ```
+ qiime feature-table filter-samples \
+  --i-table table-RNAonly.qza \
+  --m-metadata-file mapping-file.txt \
+  --p-where "SampleTime ='Post'" \
+  --o-filtered-table table-RNApost.qza
+  
+ qiime feature-table filter-samples \
+  --i-table table-DNAonly.qza \
+  --m-metadata-file mapping-file.txt \
+  --p-where "SampleTime ='Post'" \
+  --o-filtered-table table-DNApost.qza
+ 
+ ```
+ 
 
   
