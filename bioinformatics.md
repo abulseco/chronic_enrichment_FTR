@@ -71,12 +71,12 @@ qiime tools import \
 When a Naive Bayes classifier is trained on only the region of the target sequences that was sequenced, in this case the 16S rRNA gene using the 515F/806R pair, it improves taxonomic accuracy. 
 ```
  qiime feature-classifier extract-reads \
-> --i-sequences 99_perc.qza \
-> --p-f-primer GTGCCAGCMGCCGCGGTAA \
-> --p-r-primer GGACTACHVGGGTWTCTAAT \
-> --p-min-length 100 \
-> --p-max-length 400 \
-> --o-reads ref-seqs-extract.qza
+ --i-sequences 99_perc.qza \
+ --p-f-primer GTGCCAGCMGCCGCGGTAA \
+ --p-r-primer GGACTACHVGGGTWTCTAAT \
+ --p-min-length 100 \
+ --p-max-length 400 \
+ --o-reads ref-seqs-extract.qza
 ```
 #### Train the classifier
 There was a mismatch with the version of scikit-learn installed (see error below) and ran an override as suggested by QIIME 2 message boards.
@@ -90,9 +90,23 @@ conda install --override-channels -c defaults scikit-learn=0.21.2
 Make sure you have enough disc space for the next few steps  
 ```
 qiime feature-classifier fit-classifier-naive-bayes \
-> --i-reference-reads ref-seqs-extract.qza \
-> --i-reference-taxonomy ref-taxonomy.qza \
-> --o-classifier classifier.qza
+ --i-reference-reads ref-seqs-extract.qza \
+ --i-reference-taxonomy ref-taxonomy.qza \
+ --o-classifier classifier.qza
+```
+Apply sequences to the classifer to assign taxonomy
+```
+qiime taxa collapse \
+ --i-taxonomy taxonomy.qza \
+ --i-table table-merged-new.qza \
+ --p-level 6 \
+ --o-collapsed-table table-new-L6.qza
+
+qiime taxa barplot \
+ --i-table table-merged-new.qza \
+ --i-taxonomy taxonomy.qza \
+ --m-metadata-file FTR2_map_all_redo.txt \
+ --o-visualization taxa-bar-plots-all.qzv
 ```
 
   
