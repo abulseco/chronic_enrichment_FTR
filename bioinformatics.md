@@ -109,4 +109,23 @@ qiime taxa barplot \
  --o-visualization taxa-bar-plots-all.qzv
 ```
 
+# Filtering data
+In the next step, we will filter out the following: 
+* By taxonomic groups: Archaea, chloroplasts, mitochondria
+* By samples: those with < 1000 sequences per sample
+* By features: singletons < 2 
+
+```
+mkdir filtered-data
+qiime feature-table filter-samples \
+--i-table table-merged-new.qza \
+--p-min-frequency 1000 \
+--o-filtered-table filtered-data/table-nolow.qza
+
+# Then summarize to confirm the data were filtered out
+qiime feature-table summarize \
+--i-table filtered-data/table-nolow.qza \
+--o-visualization filtered-data/table-nolow.qzv
+
+
   
