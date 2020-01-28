@@ -2,6 +2,8 @@
 #### Analysis conducted in QIIME2 (v2019.10) 
 
 Updated by A. Bulseco on 1/23/2020
+Many of these analyses are exploratory
+See README file for description of specific figures
 
 ## Requirements for this workflow
 * QIIME2 v2019.10
